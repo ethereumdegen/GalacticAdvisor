@@ -1,0 +1,38 @@
+1) Make a button that enables or disables the rufus_scheduler bot that constantly updates our data using the CREST api
+
+# controller
+class ExpensesController < ApplicationController
+  JOHN_EXPENSE = 20
+  MARK_EXPENSE = 30
+end
+
+# view
+John's expense is: <%= ExpensesController::JOHN_EXPENSE %> 
+Mark's expense is: <%= ExpensesController::MARK_EXPENSE %> 
+
+
+
+
+2) The scheduler bot will increment through 'pages' of the huge dataset.
+
+
+
+
+
+3) CREST API
+
+Solar System Data
+
+regions/
+Returns a list of all regions in the game with typeIDs. Further information for the Region such as a Description, a list of Constellations, and marekt data (not working) are available from links in this data set.
+
+Markets
+
+market/{region_id}/types/{type_id}/history/
+Provides per day summary of market activity for 13 months for the region_id and type_id sent. For example, to get a summary of Tritanium in The Forge, use this link: https://public-crest.eveonline.com/market/10000002/types/34/history/
+market/groups/
+Provides a list of all market groups with descriptions and CREST links to the types of items that are part of that group.
+market/prices/ (cache: 23 hours)
+Returns the list of trade-able types and their average market price, as shown in the inventory UI in the EVE client. Also includes an adjusted market price which is used in industry calculations.
+market/types/
+Provides a list of all market items (e.g. Rifter) with typeID, the items icon, and a link to the market group for the item.
