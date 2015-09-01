@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150901171041) do
+ActiveRecord::Schema.define(version: 20150901193321) do
 
   create_table "crest_data", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -25,6 +25,25 @@ ActiveRecord::Schema.define(version: 20150901171041) do
     t.integer  "volume"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+  end
+
+  create_table "regional_item_price_data", force: :cascade do |t|
+    t.integer  "itemID"
+    t.integer  "regionID"
+    t.integer  "volume"
+    t.integer  "avgPrice"
+    t.integer  "lowPrice"
+    t.integer  "highPrice"
+    t.integer  "orderCount"
+    t.datetime "marketDate"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "regions", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

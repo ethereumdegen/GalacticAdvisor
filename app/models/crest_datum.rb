@@ -3,6 +3,9 @@ class CrestDatum < ActiveRecord::Base
 
   #using self is a lot like using static in java
 
+  @tradeRegionNames = ["Heimatar", "The Citadel", "The Forge", "Placid"]
+
+
   @totalMarketPages = 20
   @currentMarketPage = 0
 
@@ -41,9 +44,35 @@ class CrestDatum < ActiveRecord::Base
       jsondata = RestClient.get(regionsURL)  #there are 100 regions
       regionData = JSON.parse(jsondata)
 
+      #add region items to db
+      regionData["items"].each do |region|
+
+        regionURL = region["href"]
+        urlParts = regionURL.split("/")
+        regionID = urlParts[-1].to_i
+
+        regionName = region["name"]
+
+        if(existingEntry = Region.find_by_id(regionID))
+
+          existingEntry.name = regionName
+          existingEntry.save
+
+        else
+          newEntry = Region.new
+          newEntry.id = regionID
+          newEntry.name = regionName
+          newEntry.save
+        end
+
+      end
+
+
+
+
       jsondata = RestClient.get(@itemTypesURL)   #there are 27243 items
       itemTypesData = JSON.parse(jsondata)
-    #  @totalItemTypeCount = itemTypesData["totalCount_str"].to_i
+
       @itemTypePageCount = itemTypesData["pageCount"]
       @currentItemTypesQuerying = itemTypesData["items"]
 
@@ -59,8 +88,6 @@ class CrestDatum < ActiveRecord::Base
 
 
     def self.collect_item_types
-
-
 
 
      if(  @itemTypeDiscoveryIndex < @currentItemTypesQuerying.length)
@@ -79,23 +106,33 @@ class CrestDatum < ActiveRecord::Base
         jsondata = RestClient.get(itemTypeURL)   #there are 27243 items total
         itemTypeData = JSON.parse(jsondata)
 
-        if(existingEntry = ItemType.find(itemTypeID))
+        if(existingEntry = ItemType.find_by_id(itemTypeID))
 
           existingEntry.name = itemTypeData["name"]
           existingEntry.description = itemTypeData["description"]
+          existingEntry.volume = itemTypeData["volume"]
           existingEntry.save
 
         else
 
-        o = ItemType.new
-        o.id = itemTypeID
-        o.name = itemTypeData["name"]
-        o.description = itemTypeData["description"]
-        o.save
+        newEntry = ItemType.new
+        newEntry.id = itemTypeID
+        newEntry.name = itemTypeData["name"]
+        newEntry.description = itemTypeData["description"]
+        newEntry.volume = itemTypeData["volume"]
+        newEntry.save
+
         end
 
-        #p itemTypeData
         end
+
+          @itemTypeDiscoveryIndex+=1
+
+          if(itemTypeData["volume"] && itemTypeData["volume"].to_i > 0 && itemTypeID && itemTypeID.to_i)
+            self.collect_pricing( itemTypeID  )
+          end
+
+
 
      else
        #if we exhausted this page, go to the next one
@@ -116,27 +153,62 @@ class CrestDatum < ActiveRecord::Base
 
 
 
-     @itemTypeDiscoveryIndex+=1
-     
+
+
     end
 
-    def self.collect_pricing
-      puts "collecting data from crest "
-      puts self.getNextDataPage
+    def self.collect_pricing(itemId)
+
+      tradeRegions = []
+
+      Region.all.each do |region|
+
+        if(@tradeRegionNames.include? ( region.name )   )
+          tradeRegions << region
+        end
+
+      end
 
 
 
-      #keep incrementing these IDs.. they get collected from collect_tags
-      #can sent a request every 30th of a second if you want
-      #there are 86400 seconds in a day
-      regionId = 10000002
-      itemId = 34
+
+       tradeRegions.each do |tradeRegion|
+
+        regionId = tradeRegion.id
+
+        marketURL = 'https://public-crest.eveonline.com/market/'+regionId.to_s+'/types/'+itemId.to_s+'/history/'
+
+        #p marketURL
+
+        jsondata = RestClient.get(marketURL)
+        marketData = JSON.parse(jsondata)
+
+        history = marketData["items"]
+
+        history.each do |entry|
+
+          newPriceDatum = RegionalItemPriceDatum.new
+
+          newPriceDatum.itemID = itemId
+          newPriceDatum.regionID = regionId
+          newPriceDatum.marketDate = entry["date"]
+
+          newPriceDatum.volume = entry["volume"]
+          newPriceDatum.avgPrice = entry["avgPrice"]
+          newPriceDatum.lowPrice = entry["lowPrice"]
+          newPriceDatum.highPrice = entry["highPrice"]
+          newPriceDatum.orderCount = entry["orderCount"]
+
+          newPriceDatum.save
+
+          p 'saved market data'
+
+        end
+
+        # p marketData
+      end
 
 
-      jsondata = RestClient.get('https://public-crest.eveonline.com/market/'+regionId.to_s+'/types/'+itemId.to_s+'/history/')
-      marketData = JSON.parse(jsondata)
-
-      #p marketData
 
 
     end
