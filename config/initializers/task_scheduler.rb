@@ -5,8 +5,13 @@ CrestDatum.collect_tags
 
 scheduler = Rufus::Scheduler.new
 
+
 scheduler.every("5s") do
-  CrestDatum.collect_data
+  CrestDatum.collect_item_types
+end
+
+scheduler.every("5s") do
+  CrestDatum.collect_pricing
 end
 
 
