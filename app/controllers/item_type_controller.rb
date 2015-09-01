@@ -15,7 +15,7 @@ class ItemTypeController < ApplicationController
 
     output = {:total => ItemType.all.length, :rows => items}
 
-  #render json: output
+   
     render json: output
 
 
