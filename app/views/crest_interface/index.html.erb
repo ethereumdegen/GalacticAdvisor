@@ -2,7 +2,7 @@
 
 
 
-<%=
+<%
 
 urlText = "Start Market Data Collection"
 
@@ -10,6 +10,18 @@ if ( CrestDatum.collectingMarketData )
   urlText = "Stop Market Data Collection"
 end
 
-link_to urlText, :controller => 'crest_interface', :action => 'setCollectData', :collect => !CrestDatum.collectingMarketData, :html => { :class => "btn" }
-
 %>
+
+<a href="
+<%=
+url_for :controller => 'crest_interface', :action => 'setCollectData', :collect => !CrestDatum.collectingMarketData
+%>
+">
+<div class="btn btn-primary"> <%= urlText %> </div>
+</a>
+
+
+<p>
+  Last ItemType: <%= CrestDatum::latestItemType %>
+
+</p>

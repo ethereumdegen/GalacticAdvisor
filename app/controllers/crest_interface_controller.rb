@@ -2,10 +2,12 @@ class CrestInterfaceController < ApplicationController
 
     def setCollectData
       collect = params['collect']
-      CrestDatum.setCollectMarketData(collect)
 
-      render text: collect
-      #redirect_to_back
+
+      CrestDatum.setCollectMarketData( collect == 'true' )
+
+      #render text: collect
+       redirect_to_back
     end
 
     def redirect_to_back(default = root_url)

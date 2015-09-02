@@ -23,6 +23,8 @@ class CrestDatum < ActiveRecord::Base
 
   @tradeRegions = []
 
+
+
 #RestClient.get 'http://example.com/resource'
 
 #RestClient.get 'http://example.com/resource', {:params => {:id => 50, 'foo' => 'bar'}}
@@ -32,7 +34,19 @@ class CrestDatum < ActiveRecord::Base
     return @tradeRegionNames
   end
 
+  def self.percentScanned
+    return  (@nextItemTypesPageIndex).to_f / @itemTypePageCount.to_f
+  end
+
+    def self.latestItemType
+      return @currentItemTypesQuerying[@itemTypeDiscoveryIndex]
+    end
+
+
     def self.setCollectMarketData(collect)
+      p 'setting collect to '
+      p collect
+
       @collectMarketData  = collect
     end
 
@@ -186,6 +200,7 @@ class CrestDatum < ActiveRecord::Base
 
        jsondata = RestClient.get@itemTypesURL, {:params => {:page => @nextItemTypesPageIndex}}
        @nextItemTypesPageIndex += 1
+       @itemTypeDiscoveryIndex = 0
        itemTypesData = JSON.parse(jsondata)
        @currentItemTypesQuerying = itemTypesData["items"]
 

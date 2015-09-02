@@ -6,12 +6,11 @@ CrestDatum.collect_tags
 scheduler = Rufus::Scheduler.new
 
 
-scheduler.every("5s") do
+scheduler.every("10s") do
   if( CrestDatum.collectingMarketData )
   CrestDatum.collect_item_types
   end
 end
-
 
 
 

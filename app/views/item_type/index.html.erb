@@ -16,7 +16,7 @@
              <thead>
              <tr>
                  <th data-field="id" data-sortable="true">ID</th>
-                 <th data-field="name"  data-sortable="true">Item Name</th>
+                 <th data-field="name" data-formatter="nameFormatter" data-sortable="true">Item Name</th>
 
              </tr>
              </thead>
@@ -27,6 +27,10 @@
 <script>
     var $table = $('#table');
 
+    function nameFormatter(value,row)
+       {
+         return '<a href="/item_type/'  + row.id + '">'+value+'</a>'
+       }
 
 
     $(function () {

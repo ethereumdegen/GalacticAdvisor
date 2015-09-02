@@ -6,8 +6,11 @@
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body>
+
 
 
   <!-- Header -->
@@ -20,14 +23,23 @@
         <a class="navbar-brand" href="/">Galactic Advisor</a>
       </div>
       <div class="navbar-collapse collapse">
+
+        <div style="color:#eee;margin-left:15px;margin-top:15px" >
+        <% if CrestDatum.collectingMarketData %>
+        <i class="fa fa-spinner fa-spin"></i> Collecting Market Data...
+        <% end %>
+      </div>
+
         <ul class="nav navbar-nav navbar-right">
+
+
 
           <li class="dropdown">
             <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
-              <i class="glyphicon glyphicon-user"></i> Admin <span class="caret"></span></a>
+              <i class="fa fa-user"></i>Admin <span class="caret"></span></a>
             <ul id="g-account-menu" class="dropdown-menu" role="menu">
               <li><a href="#">My Profile</a></li>
-              <li><a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>
+              <li><a href="#"><i class="fa fa-lock"></i> Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -38,9 +50,14 @@
 
 
 
-
+  <!-- Main -->
+  <div class="container">
 
 <%= yield %>
+
+</div><!--/container-->
+<!-- /Main -->
+
 
 </body>
 </html>
