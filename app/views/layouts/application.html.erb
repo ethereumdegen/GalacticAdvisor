@@ -24,11 +24,7 @@
       </div>
       <div class="navbar-collapse collapse">
 
-        <div style="color:#eee;margin-left:15px;margin-top:15px" >
-        <% if CrestDatum.collectingMarketData %>
-        <i class="fa fa-spinner fa-spin"></i> Collecting Market Data...
-        <% end %>
-      </div>
+
 
         <ul class="nav navbar-nav navbar-right">
 
@@ -53,7 +49,41 @@
   <!-- Main -->
   <div class="container">
 
+    <!-- upper section -->
+    <div class="row">
+    <div class="col-sm-3">
+        <!-- left -->
+
+        <!--
+        <h3><i class="fa fa-wrench"></i>Toolbox</h3>
+      -->
+
+
+        <hr>
+
+        <ul class="nav nav-stacked">
+          <li><a href="<%= url_for :controller => 'home', :action => 'index' %>"><i class="fa fa-home"></i> Home</a></li>
+          <li><a href="<%= url_for :controller => 'item_type', :action => 'index' %>"><i class="fa fa-shield"></i> Item Types</a></li>
+          <li><a href="<%= url_for :controller => 'crest_interface', :action => 'index' %>">
+            <% if CrestDatum.collectingMarketData %>
+            <i class="fa fa-spinner fa-spin"></i>
+            <%else%>
+              <i class="fa fa-times"></i>
+          <%  end  %>
+             Market Scanner</a></li>
+
+        </ul>
+
+        <hr>
+
+      </div><!-- /span-3 -->
+      <div class="col-sm-9">
+
 <%= yield %>
+
+</div><!--/col-span-9-->
+
+</div><!--/row-->
 
 </div><!--/container-->
 <!-- /Main -->
