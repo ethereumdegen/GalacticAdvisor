@@ -11,27 +11,48 @@
 <%=  item.marketDataLastCollected %>
 </h4>
 
-<div id="myfirstchart" style="height: 550px;"></div>
+<h4> Average Prices </h4>
+<div id="avgPriceChart" style="height: 550px;"></div>
+
+<h4> Low Prices </h4>
+<div id="lowPriceChart" style="height: 550px;"></div>
+
+<h4> High Prices </h4>
+<div id="highPriceChart" style="height: 550px;"></div>
 
 <script>
 
 <%
 
+lowPriceData = [
 
+]
 
-itemdata = [
+highPriceData = [
+
+]
+
+avgPriceData = [
 
 ]
 
   RegionalItemPriceDatum.where(itemID: params[:id]).each do |dataPoint|
 
-      dataInfo = { date: dataPoint.marketDate  }
 
       region = Region.find_by_id(dataPoint.regionID)
 
-      dataInfo[ region.name ] = dataPoint.avgPrice
+      avgInfo = { date: dataPoint.marketDate  }
+      avgInfo[ region.name ] = dataPoint.avgPrice
+      avgPriceData.push( avgInfo  )
 
-      itemdata.push( dataInfo  )
+      lowInfo = { date: dataPoint.marketDate  }
+      lowInfo[ region.name ] = dataPoint.lowPrice
+      lowPriceData.push( lowInfo  )
+
+      highInfo = { date: dataPoint.marketDate  }
+      highInfo[ region.name ] = dataPoint.highPrice
+      highPriceData.push( highInfo  )
+
 
 
   end
@@ -44,10 +65,40 @@ itemdata = [
 
 new Morris.Line({
   // ID of the element in which to draw the chart.
-  element: 'myfirstchart',
+  element: 'avgPriceChart',
   // Chart data records -- each entry in this array corresponds to a point on
   // the chart.
-  data: <%=  itemdata.to_json.html_safe %>,
+  data: <%=  avgPriceData.to_json.html_safe %>,
+  // The name of the data record attribute that contains x-values.
+  xkey: 'date',
+  // A list of names of data record attributes that contain y-values.
+  ykeys: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>,
+  // Labels for the ykeys -- will be displayed when you hover over the
+  // chart.
+  labels: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>
+});
+
+new Morris.Line({
+  // ID of the element in which to draw the chart.
+  element: 'lowPriceChart',
+  // Chart data records -- each entry in this array corresponds to a point on
+  // the chart.
+  data: <%=  lowPriceData.to_json.html_safe %>,
+  // The name of the data record attribute that contains x-values.
+  xkey: 'date',
+  // A list of names of data record attributes that contain y-values.
+  ykeys: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>,
+  // Labels for the ykeys -- will be displayed when you hover over the
+  // chart.
+  labels: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>
+});
+
+new Morris.Line({
+  // ID of the element in which to draw the chart.
+  element: 'highPriceChart',
+  // Chart data records -- each entry in this array corresponds to a point on
+  // the chart.
+  data: <%=  highPriceData.to_json.html_safe %>,
   // The name of the data record attribute that contains x-values.
   xkey: 'date',
   // A list of names of data record attributes that contain y-values.
