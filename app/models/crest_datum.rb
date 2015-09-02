@@ -127,13 +127,9 @@ class CrestDatum < ActiveRecord::Base
 
 
 
-
-
-
-
         if( existingEntry  )
 
-          if(existingEntry.updated_at > 1.week.ago )  #updated recently -> go to next one
+          if(existingEntry.updated_at > 1.week.ago )  #updated recently -> go to next one with recursion
 
             @itemTypeDiscoveryIndex+=1
             self.collect_item_types
