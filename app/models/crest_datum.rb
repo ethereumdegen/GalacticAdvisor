@@ -21,6 +21,8 @@ class CrestDatum < ActiveRecord::Base
 
   @nextItemTypesPageIndex=0
 
+  @tradeRegions = []
+
 #RestClient.get 'http://example.com/resource'
 
 #RestClient.get 'http://example.com/resource', {:params => {:id => 50, 'foo' => 'bar'}}
@@ -77,6 +79,16 @@ class CrestDatum < ActiveRecord::Base
 
 
 
+      Region.all.each do |region|
+
+        if(@tradeRegionNames.include? ( region.name )   )
+          @tradeRegions << region
+        end
+
+      end
+
+
+
       jsondata = RestClient.get(@itemTypesURL)   #there are 27243 items
       itemTypesData = JSON.parse(jsondata)
 
@@ -110,17 +122,39 @@ class CrestDatum < ActiveRecord::Base
         p itemTypeURL
 
         begin
-        jsondata = RestClient.get(itemTypeURL)   #there are 27243 items total
-        itemTypeData = JSON.parse(jsondata)
 
-        if(existingEntry = ItemType.find_by_id(itemTypeID))
+         existingEntry = ItemType.find_by_id(itemTypeID)
+
+
+
+
+
+
+
+        if( existingEntry  )
+
+          if(existingEntry.updated_at > 1.week.ago )  #updated recently -> go to next one
+
+            @itemTypeDiscoveryIndex+=1
+            self.collect_item_types
+            return
+
+          else
+
+            jsondata = RestClient.get(itemTypeURL)   #there are 27243 items total
+            itemTypeData = JSON.parse(jsondata)
+
 
           existingEntry.name = itemTypeData["name"]
           existingEntry.description = itemTypeData["description"]
           existingEntry.volume = itemTypeData["volume"]
           existingEntry.save
+          end
 
         else
+
+          jsondata = RestClient.get(itemTypeURL)   #there are 27243 items total
+          itemTypeData = JSON.parse(jsondata)
 
         newEntry = ItemType.new
         newEntry.id = itemTypeID
@@ -140,7 +174,7 @@ class CrestDatum < ActiveRecord::Base
           #only collect market data if it is stale or doesnt exist
         if(itemType && (itemType.marketDataLastCollected == nil || (itemType.marketDataLastCollected - DateTime.now) > 1.week ) )
 
-            if(itemTypeData["published"] == true && itemTypeData["volume"] && itemTypeData["volume"].to_i > 0 )
+            if(itemTypeData["published"] == true   )
               self.collect_pricing( itemType   )
             end
 
@@ -176,18 +210,16 @@ class CrestDatum < ActiveRecord::Base
 
       itemId = itemType.id
 
-      tradeRegions = []
-
-      Region.all.each do |region|
-
-        if(@tradeRegionNames.include? ( region.name )   )
-          tradeRegions << region
-        end
-
-      end
 
 
-       tradeRegions.each do |tradeRegion|
+
+      begin
+
+        RegionalItemPriceDatum.where(itemID: itemId).destroy_all  #remote the stale data
+
+
+
+       @tradeRegions.each do |tradeRegion|
 
         regionId = tradeRegion.id
 
@@ -198,8 +230,6 @@ class CrestDatum < ActiveRecord::Base
         jsondata = RestClient.get(marketURL)
         marketData = JSON.parse(jsondata)
 
-
-        RegionalItemPriceDatum.where(itemID: itemId).destroy_all  #remote the stale data
 
         history = marketData["items"]
 
@@ -223,20 +253,32 @@ class CrestDatum < ActiveRecord::Base
 
         end
 
-        itemType.marketDataLastCollected = DateTime.now
-        itemType.save
-
-
-        # p marketData
-      end
 
 
 
+      end  #end the loop
+
+    ensure
+      clear_active_connections!
+    end
+
+      itemType.marketDataLastCollected = DateTime.now
+      itemType.save
 
     end
 
 
 #use https://github.com/rest-client/rest-client
+
+
+
+# Returns any connections in use by the current thread back to the pool,
+# and also returns connections to the pool cached by threads that are no
+# longer alive.
+def clear_active_connections!
+  @connection_pools.each_value {|pool| pool.release_connection }
+end
+
 
 
 end
