@@ -11,13 +11,9 @@
       <hr>
 
       <ul class="nav nav-stacked">
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-flash"></i> Alerts</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-link"></i> Links</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-list-alt"></i> Reports</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-book"></i> Books</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-briefcase"></i> Tools</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-time"></i> Real-time</a></li>
-        <li><a href="javascript:;"><i class="glyphicon glyphicon-plus"></i> Advanced..</a></li>
+        <li><a href="<%= url_for :controller => 'item_type', :action => 'index' %>"><i class="fa fa-camera-retro"></i> Item Types</a></li>
+        <li><a href="<%= url_for :controller => 'crest_interface', :action => 'index' %>"><i class="fa fa-camera-retro"></i> Crest Interface</a></li>
+       
       </ul>
 
       <hr>
@@ -308,6 +304,6 @@
 
 
 	<!-- script references -->
-		 
+
 	</body>
 </html>

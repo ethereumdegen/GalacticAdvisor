@@ -1,1 +1,60 @@
-show
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+
+
+<% item = ItemType.find_by_id(params[:id]) %>
+
+<h2>
+<%=  item.name %>
+</h2>
+
+<h4> Collected on
+<%=  item.marketDataLastCollected %>
+</h4>
+
+<div id="myfirstchart" style="height: 550px;"></div>
+
+<script>
+
+<%
+
+
+
+itemdata = [
+
+]
+
+  RegionalItemPriceDatum.where(itemID: params[:id]).each do |dataPoint|
+
+      dataInfo = { date: dataPoint.marketDate  }
+
+      region = Region.find_by_id(dataPoint.regionID)
+
+      dataInfo[ region.name ] = dataPoint.avgPrice
+
+      itemdata.push( dataInfo  )
+
+
+  end
+
+
+
+
+%>
+
+
+new Morris.Line({
+  // ID of the element in which to draw the chart.
+  element: 'myfirstchart',
+  // Chart data records -- each entry in this array corresponds to a point on
+  // the chart.
+  data: <%=  itemdata.to_json.html_safe %>,
+  // The name of the data record attribute that contains x-values.
+  xkey: 'date',
+  // A list of names of data record attributes that contain y-values.
+  ykeys: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>,
+  // Labels for the ykeys -- will be displayed when you hover over the
+  // chart.
+  labels: <%=  CrestDatum.tradeRegionNames.to_json.html_safe %>
+});
+
+</script>

@@ -1,0 +1,15 @@
+<h3>Crest Interface </h3>
+
+
+
+<%=
+
+urlText = "Start Market Data Collection"
+
+if ( CrestDatum.collectingMarketData )
+  urlText = "Stop Market Data Collection"
+end
+
+link_to urlText, :controller => 'crest_interface', :action => 'setCollectData', :collect => !CrestDatum.collectingMarketData, :html => { :class => "btn" }
+
+%>

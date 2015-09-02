@@ -6,6 +6,8 @@ class CrestDatum < ActiveRecord::Base
   @tradeRegionNames = ["Heimatar", "The Citadel", "The Forge", "Placid"]
 
 
+  @collectMarketData = false
+
   @totalMarketPages = 20
   @currentMarketPage = 0
 
@@ -24,12 +26,17 @@ class CrestDatum < ActiveRecord::Base
 #RestClient.get 'http://example.com/resource', {:params => {:id => 50, 'foo' => 'bar'}}
 
 
-    def self.getNextDataPage
-      answer = @currentMarketPage;
+  def self.tradeRegionNames
+    return @tradeRegionNames
+  end
 
-      @currentMarketPage +=1
+    def self.setCollectMarketData(collect)
+      @collectMarketData  = collect
+    end
 
-      return answer
+
+    def self.collectingMarketData
+      return @collectMarketData
     end
 
 
@@ -128,10 +135,18 @@ class CrestDatum < ActiveRecord::Base
 
           @itemTypeDiscoveryIndex+=1
 
-          if(itemTypeData["volume"] && itemTypeData["volume"].to_i > 0 && itemTypeID && itemTypeID.to_i)
-            self.collect_pricing( itemTypeID  )
-          end
+          itemType = ItemType.find_by_id(itemTypeID)
 
+          #only collect market data if it is stale or doesnt exist
+        if(itemType && (itemType.marketDataLastCollected == nil || (itemType.marketDataLastCollected - DateTime.now) > 1.week ) )
+
+            if(itemTypeData["published"] == true && itemTypeData["volume"] && itemTypeData["volume"].to_i > 0 )
+              self.collect_pricing( itemType   )
+            end
+
+        else
+          p 'already have recent market data'
+        end
 
 
      else
@@ -157,7 +172,9 @@ class CrestDatum < ActiveRecord::Base
 
     end
 
-    def self.collect_pricing(itemId)
+    def self.collect_pricing(itemType)
+
+      itemId = itemType.id
 
       tradeRegions = []
 
@@ -170,8 +187,6 @@ class CrestDatum < ActiveRecord::Base
       end
 
 
-
-
        tradeRegions.each do |tradeRegion|
 
         regionId = tradeRegion.id
@@ -182,6 +197,9 @@ class CrestDatum < ActiveRecord::Base
 
         jsondata = RestClient.get(marketURL)
         marketData = JSON.parse(jsondata)
+
+
+        RegionalItemPriceDatum.where(itemID: itemId).destroy_all  #remote the stale data
 
         history = marketData["items"]
 
@@ -204,6 +222,10 @@ class CrestDatum < ActiveRecord::Base
           p 'saved market data'
 
         end
+
+        itemType.marketDataLastCollected = DateTime.now
+        itemType.save
+
 
         # p marketData
       end

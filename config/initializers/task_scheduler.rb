@@ -7,10 +7,12 @@ scheduler = Rufus::Scheduler.new
 
 
 scheduler.every("5s") do
+  if( CrestDatum.collectingMarketData )
   CrestDatum.collect_item_types
+  end
 end
 
- 
+
 
 
 scheduler.every("1d") do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150901193321) do
+ActiveRecord::Schema.define(version: 20150902144430) do
 
   create_table "crest_data", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -23,8 +23,9 @@ ActiveRecord::Schema.define(version: 20150901193321) do
     t.text     "description"
     t.integer  "iconID"
     t.integer  "volume"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.datetime "marketDataLastCollected"
   end
 
   create_table "regional_item_price_data", force: :cascade do |t|
