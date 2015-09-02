@@ -1,6 +1,6 @@
-== Galactic Advisor
+## Galactic Advisor
 
-A market-price graphing system that automatically pulls data from the CREST API.
+A market-price graphing system that automatically pulls data from the CREST API.  Built in Rails 4.2.1.
 
   
  
